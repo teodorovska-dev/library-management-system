@@ -6,6 +6,7 @@ import com.library.management.service.book.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public BookResponseDto createBook(@Valid @RequestBody BookRequestDto requestDto) {
         return bookService.createBook(requestDto);
     }
@@ -35,6 +37,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public BookResponseDto updateBook(@PathVariable Long id,
                                       @Valid @RequestBody BookRequestDto requestDto) {
         return bookService.updateBook(id, requestDto);
@@ -42,6 +45,7 @@ public class BookController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void writeOffBook(@PathVariable Long id) {
         bookService.writeOffBook(id);
     }
