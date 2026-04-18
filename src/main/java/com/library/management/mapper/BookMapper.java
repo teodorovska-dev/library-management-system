@@ -1,0 +1,82 @@
+package com.library.management.mapper;
+
+import com.library.management.dto.book.BookRequestDto;
+import com.library.management.dto.book.BookResponseDto;
+import com.library.management.entity.Book;
+import com.library.management.enums.BookStatus;
+import org.springframework.stereotype.Component;
+
+@Component
+public class BookMapper {
+
+    public Book toEntity(BookRequestDto dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        Book book = new Book();
+        book.setTitle(dto.getTitle());
+        book.setAuthorSurname(dto.getAuthorSurname());
+        book.setAuthorInitials(dto.getAuthorInitials());
+        book.setPublicationYear(dto.getPublicationYear());
+        book.setCopiesCount(dto.getCopiesCount());
+        book.setGenre(dto.getGenre());
+        book.setLanguage(dto.getLanguage());
+        book.setIsbn(dto.getIsbn());
+        book.setPublisher(dto.getPublisher());
+        book.setDescription(dto.getDescription());
+        book.setCoverImageUrl(dto.getCoverImageUrl());
+
+        if (dto.getCopiesCount() != null && dto.getCopiesCount() == 0) {
+            book.setStatus(BookStatus.OUT_OF_STOCK);
+        } else {
+            book.setStatus(BookStatus.AVAILABLE);
+        }
+
+        return book;
+    }
+
+    public BookResponseDto toResponseDto(Book book) {
+        if (book == null) {
+            return null;
+        }
+
+        return BookResponseDto.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .authorSurname(book.getAuthorSurname())
+                .authorInitials(book.getAuthorInitials())
+                .publicationYear(book.getPublicationYear())
+                .copiesCount(book.getCopiesCount())
+                .genre(book.getGenre())
+                .language(book.getLanguage())
+                .isbn(book.getIsbn())
+                .publisher(book.getPublisher())
+                .description(book.getDescription())
+                .coverImageUrl(book.getCoverImageUrl())
+                .status(book.getStatus())
+                .createdAt(book.getCreatedAt())
+                .updatedAt(book.getUpdatedAt())
+                .build();
+    }
+
+    public void updateEntityFromDto(BookRequestDto dto, Book book) {
+        book.setTitle(dto.getTitle());
+        book.setAuthorSurname(dto.getAuthorSurname());
+        book.setAuthorInitials(dto.getAuthorInitials());
+        book.setPublicationYear(dto.getPublicationYear());
+        book.setCopiesCount(dto.getCopiesCount());
+        book.setGenre(dto.getGenre());
+        book.setLanguage(dto.getLanguage());
+        book.setIsbn(dto.getIsbn());
+        book.setPublisher(dto.getPublisher());
+        book.setDescription(dto.getDescription());
+        book.setCoverImageUrl(dto.getCoverImageUrl());
+
+        if (dto.getCopiesCount() != null && dto.getCopiesCount() == 0) {
+            book.setStatus(BookStatus.OUT_OF_STOCK);
+        } else if (book.getStatus() != BookStatus.WRITTEN_OFF) {
+            book.setStatus(BookStatus.AVAILABLE);
+        }
+    }
+}
