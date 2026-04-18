@@ -25,4 +25,6 @@ public class RegisterRequestDto {
 
     @NotBlank(message = "Role is required")
     private String role;
+
+    private String adminAccessKey;
 }

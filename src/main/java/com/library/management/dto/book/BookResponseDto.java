@@ -27,4 +27,8 @@ public class BookResponseDto {
     private BookStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long createdById;
+    private String createdByName;
+    private Long updatedById;
+    private String updatedByName;
 }

@@ -57,6 +57,10 @@ public class BookMapper {
                 .status(book.getStatus())
                 .createdAt(book.getCreatedAt())
                 .updatedAt(book.getUpdatedAt())
+                .createdById(book.getCreatedBy() != null ? book.getCreatedBy().getId() : null)
+                .createdByName(book.getCreatedBy() != null ? book.getCreatedBy().getFullName() : null)
+                .updatedById(book.getUpdatedBy() != null ? book.getUpdatedBy().getId() : null)
+                .updatedByName(book.getUpdatedBy() != null ? book.getUpdatedBy().getFullName() : null)
                 .build();
     }
 

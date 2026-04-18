@@ -10,6 +10,7 @@ import com.library.management.repository.RoleRepository;
 import com.library.management.repository.UserRepository;
 import com.library.management.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,9 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
+    @Value("${app.security.admin-registration-key}")
+    private String adminRegistrationKey;
+
     @Override
     public AuthResponseDto register(RegisterRequestDto requestDto) {
         if (userRepository.existsByEmail(requestDto.getEmail())) {
@@ -36,6 +40,16 @@ public class AuthServiceImpl implements AuthService {
             roleName = RoleName.valueOf(requestDto.getRole().toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new InvalidRequestException("Invalid role value");
+        }
+
+        if (roleName == RoleName.ADMIN) {
+            if (requestDto.getAdminAccessKey() == null || requestDto.getAdminAccessKey().isBlank()) {
+                throw new InvalidRequestException("Admin access key is required for administrator registration");
+            }
+
+            if (!adminRegistrationKey.equals(requestDto.getAdminAccessKey())) {
+                throw new InvalidRequestException("Invalid admin access key");
+            }
         }
 
         Role role = roleRepository.findByName(roleName)
