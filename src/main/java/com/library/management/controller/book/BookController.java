@@ -2,12 +2,14 @@ package com.library.management.controller.book;
 
 import com.library.management.dto.book.BookRequestDto;
 import com.library.management.dto.book.BookResponseDto;
+import com.library.management.dto.common.PagedResponseDto;
 import com.library.management.service.book.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -58,5 +60,39 @@ public class BookController {
     @GetMapping("/sorted/year")
     public List<BookResponseDto> getBooksSortedByPublicationYear() {
         return bookService.getBooksSortedByPublicationYear();
+    }
+
+    @GetMapping("/paged")
+    public PagedResponseDto<BookResponseDto> getBooksPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        return bookService.getBooksPaginated(page, size, sortBy, sortDir);
+    }
+
+    @GetMapping("/search")
+    public PagedResponseDto<BookResponseDto> searchBooks(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        return bookService.searchBooks(keyword, page, size, sortBy, sortDir);
+    }
+
+    @GetMapping("/filter")
+    public PagedResponseDto<BookResponseDto> filterBooks(
+            @RequestParam(required = false) String genre,
+            @RequestParam(required = false) String language,
+            @RequestParam(required = false) Integer publicationYear,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        return bookService.filterBooks(genre, language, publicationYear, page, size, sortBy, sortDir);
     }
 }

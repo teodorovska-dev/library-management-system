@@ -11,6 +11,8 @@ import com.library.management.repository.BookRepository;
 import com.library.management.security.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.library.management.dto.common.PagedResponseDto;
+import org.springframework.data.domain.*;
 
 import java.util.List;
 
@@ -92,5 +94,83 @@ public class BookServiceImpl implements BookService {
     private Book findBookByIdOrThrow(Long id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book with id " + id + " not found"));
+    }
+
+    @Override
+    public PagedResponseDto<BookResponseDto> getBooksPaginated(int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Book> booksPage = bookRepository.findAllByStatusNot(BookStatus.WRITTEN_OFF, pageable);
+
+        return PagedResponseDto.<BookResponseDto>builder()
+                .content(booksPage.getContent().stream().map(bookMapper::toResponseDto).toList())
+                .page(booksPage.getNumber())
+                .size(booksPage.getSize())
+                .totalElements(booksPage.getTotalElements())
+                .totalPages(booksPage.getTotalPages())
+                .last(booksPage.isLast())
+                .build();
+    }
+
+    @Override
+    public PagedResponseDto<BookResponseDto> searchBooks(String keyword, int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Book> booksPage = bookRepository.searchBooks(BookStatus.WRITTEN_OFF, keyword, pageable);
+
+        return PagedResponseDto.<BookResponseDto>builder()
+                .content(booksPage.getContent().stream().map(bookMapper::toResponseDto).toList())
+                .page(booksPage.getNumber())
+                .size(booksPage.getSize())
+                .totalElements(booksPage.getTotalElements())
+                .totalPages(booksPage.getTotalPages())
+                .last(booksPage.isLast())
+                .build();
+    }
+
+    @Override
+    public PagedResponseDto<BookResponseDto> filterBooks(String genre, String language, Integer publicationYear,
+                                                         int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Book> booksPage;
+
+        if (genre != null && language != null) {
+            booksPage = bookRepository.findByStatusNotAndGenreIgnoreCaseAndLanguageIgnoreCase(
+                    BookStatus.WRITTEN_OFF, genre, language, pageable
+            );
+        } else if (genre != null) {
+            booksPage = bookRepository.findByStatusNotAndGenreIgnoreCase(
+                    BookStatus.WRITTEN_OFF, genre, pageable
+            );
+        } else if (language != null) {
+            booksPage = bookRepository.findByStatusNotAndLanguageIgnoreCase(
+                    BookStatus.WRITTEN_OFF, language, pageable
+            );
+        } else if (publicationYear != null) {
+            booksPage = bookRepository.findByStatusNotAndPublicationYear(
+                    BookStatus.WRITTEN_OFF, publicationYear, pageable
+            );
+        } else {
+            booksPage = bookRepository.findAllByStatusNot(BookStatus.WRITTEN_OFF, pageable);
+        }
+
+        return PagedResponseDto.<BookResponseDto>builder()
+                .content(booksPage.getContent().stream().map(bookMapper::toResponseDto).toList())
+                .page(booksPage.getNumber())
+                .size(booksPage.getSize())
+                .totalElements(booksPage.getTotalElements())
+                .totalPages(booksPage.getTotalPages())
+                .last(booksPage.isLast())
+                .build();
     }
 }

@@ -2,6 +2,7 @@ package com.library.management.service.book;
 
 import com.library.management.dto.book.BookRequestDto;
 import com.library.management.dto.book.BookResponseDto;
+import com.library.management.dto.common.PagedResponseDto;
 
 import java.util.List;
 
@@ -20,4 +21,11 @@ public interface BookService {
     List<BookResponseDto> getBooksSortedByAuthor();
 
     List<BookResponseDto> getBooksSortedByPublicationYear();
+
+    PagedResponseDto<BookResponseDto> getBooksPaginated(int page, int size, String sortBy, String sortDir);
+
+    PagedResponseDto<BookResponseDto> searchBooks(String keyword, int page, int size, String sortBy, String sortDir);
+
+    PagedResponseDto<BookResponseDto> filterBooks(String genre, String language, Integer publicationYear,
+                                                  int page, int size, String sortBy, String sortDir);
 }
