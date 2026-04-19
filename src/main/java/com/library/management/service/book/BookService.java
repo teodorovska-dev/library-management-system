@@ -1,5 +1,6 @@
 package com.library.management.service.book;
 
+import com.library.management.dto.book.BookFilterRequestDto;
 import com.library.management.dto.book.BookRequestDto;
 import com.library.management.dto.book.BookResponseDto;
 import com.library.management.dto.common.PagedResponseDto;
@@ -26,6 +27,9 @@ public interface BookService {
 
     PagedResponseDto<BookResponseDto> searchBooks(String keyword, int page, int size, String sortBy, String sortDir);
 
-    PagedResponseDto<BookResponseDto> filterBooks(String genre, String language, Integer publicationYear,
-                                                  int page, int size, String sortBy, String sortDir);
+    PagedResponseDto<BookResponseDto> filterBooks(BookFilterRequestDto filterRequestDto,
+                                                  int page,
+                                                  int size,
+                                                  String sortBy,
+                                                  String sortDir);
 }

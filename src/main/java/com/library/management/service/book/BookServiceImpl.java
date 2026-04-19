@@ -13,6 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.library.management.dto.common.PagedResponseDto;
 import org.springframework.data.domain.*;
+import com.library.management.dto.book.BookFilterRequestDto;
+import com.library.management.specification.BookSpecification;
+import com.library.management.util.BookSortFields;
+import com.library.management.util.PageableUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
@@ -98,72 +105,61 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public PagedResponseDto<BookResponseDto> getBooksPaginated(int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageableUtil.buildPageable(
+                page,
+                size,
+                sortBy,
+                sortDir,
+                BookSortFields.ALLOWED_SORT_FIELDS
+        );
 
-        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Book> booksPage = bookRepository.findAllByStatusNot(BookStatus.WRITTEN_OFF, pageable);
 
-        return PagedResponseDto.<BookResponseDto>builder()
-                .content(booksPage.getContent().stream().map(bookMapper::toResponseDto).toList())
-                .page(booksPage.getNumber())
-                .size(booksPage.getSize())
-                .totalElements(booksPage.getTotalElements())
-                .totalPages(booksPage.getTotalPages())
-                .last(booksPage.isLast())
-                .build();
+        return mapToPagedResponse(booksPage);
     }
 
     @Override
     public PagedResponseDto<BookResponseDto> searchBooks(String keyword, int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageableUtil.buildPageable(
+                page,
+                size,
+                sortBy,
+                sortDir,
+                BookSortFields.ALLOWED_SORT_FIELDS
+        );
 
-        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Book> booksPage = bookRepository.searchBooks(BookStatus.WRITTEN_OFF, keyword, pageable);
 
-        return PagedResponseDto.<BookResponseDto>builder()
-                .content(booksPage.getContent().stream().map(bookMapper::toResponseDto).toList())
-                .page(booksPage.getNumber())
-                .size(booksPage.getSize())
-                .totalElements(booksPage.getTotalElements())
-                .totalPages(booksPage.getTotalPages())
-                .last(booksPage.isLast())
-                .build();
+        return mapToPagedResponse(booksPage);
     }
 
     @Override
-    public PagedResponseDto<BookResponseDto> filterBooks(String genre, String language, Integer publicationYear,
-                                                         int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+    public PagedResponseDto<BookResponseDto> filterBooks(BookFilterRequestDto filterRequestDto,
+                                                         int page,
+                                                         int size,
+                                                         String sortBy,
+                                                         String sortDir) {
+        Pageable pageable = PageableUtil.buildPageable(
+                page,
+                size,
+                sortBy,
+                sortDir,
+                BookSortFields.ALLOWED_SORT_FIELDS
+        );
 
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Book> booksPage;
+        Specification<Book> specification = Specification
+                .where(BookSpecification.statusNot(BookStatus.WRITTEN_OFF))
+                .and(BookSpecification.containsKeyword(filterRequestDto.getKeyword()))
+                .and(BookSpecification.hasGenre(filterRequestDto.getGenre()))
+                .and(BookSpecification.hasLanguage(filterRequestDto.getLanguage()))
+                .and(BookSpecification.hasPublicationYear(filterRequestDto.getPublicationYear()));
 
-        if (genre != null && language != null) {
-            booksPage = bookRepository.findByStatusNotAndGenreIgnoreCaseAndLanguageIgnoreCase(
-                    BookStatus.WRITTEN_OFF, genre, language, pageable
-            );
-        } else if (genre != null) {
-            booksPage = bookRepository.findByStatusNotAndGenreIgnoreCase(
-                    BookStatus.WRITTEN_OFF, genre, pageable
-            );
-        } else if (language != null) {
-            booksPage = bookRepository.findByStatusNotAndLanguageIgnoreCase(
-                    BookStatus.WRITTEN_OFF, language, pageable
-            );
-        } else if (publicationYear != null) {
-            booksPage = bookRepository.findByStatusNotAndPublicationYear(
-                    BookStatus.WRITTEN_OFF, publicationYear, pageable
-            );
-        } else {
-            booksPage = bookRepository.findAllByStatusNot(BookStatus.WRITTEN_OFF, pageable);
-        }
+        Page<Book> booksPage = bookRepository.findAll(specification, pageable);
 
+        return mapToPagedResponse(booksPage);
+    }
+
+    private PagedResponseDto<BookResponseDto> mapToPagedResponse(Page<Book> booksPage) {
         return PagedResponseDto.<BookResponseDto>builder()
                 .content(booksPage.getContent().stream().map(bookMapper::toResponseDto).toList())
                 .page(booksPage.getNumber())

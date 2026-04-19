@@ -3,6 +3,7 @@ package com.library.management.controller.book;
 import com.library.management.dto.book.BookRequestDto;
 import com.library.management.dto.book.BookResponseDto;
 import com.library.management.dto.common.PagedResponseDto;
+import com.library.management.dto.book.BookFilterRequestDto;
 import com.library.management.service.book.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +86,7 @@ public class BookController {
 
     @GetMapping("/filter")
     public PagedResponseDto<BookResponseDto> filterBooks(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) String language,
             @RequestParam(required = false) Integer publicationYear,
@@ -93,6 +95,13 @@ public class BookController {
             @RequestParam(defaultValue = "title") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        return bookService.filterBooks(genre, language, publicationYear, page, size, sortBy, sortDir);
+        BookFilterRequestDto filterRequestDto = BookFilterRequestDto.builder()
+                .keyword(keyword)
+                .genre(genre)
+                .language(language)
+                .publicationYear(publicationYear)
+                .build();
+
+        return bookService.filterBooks(filterRequestDto, page, size, sortBy, sortDir);
     }
 }
