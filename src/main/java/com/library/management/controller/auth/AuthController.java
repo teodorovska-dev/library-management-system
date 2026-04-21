@@ -37,7 +37,7 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 MessageResponseDto.builder()
-                        .message("Password reset code has been sent successfully")
+                        .message("If an account with that email exists, a verification code has been sent")
                         .build()
         );
     }

@@ -10,4 +10,6 @@ public interface PasswordResetCodeRepository extends JpaRepository<PasswordReset
     Optional<PasswordResetCode> findTopByEmailOrderByCreatedAtDesc(String email);
 
     Optional<PasswordResetCode> findByEmailAndCodeAndUsedFalse(String email, String code);
+
+    Optional<PasswordResetCode> findByEmailAndCodeAndUsedFalseAndVerifiedTrue(String email, String code);
 }
