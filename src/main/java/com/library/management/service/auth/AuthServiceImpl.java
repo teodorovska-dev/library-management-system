@@ -1,6 +1,8 @@
 package com.library.management.service.auth;
 
-import com.library.management.dto.auth.*;
+import com.library.management.dto.auth.AuthResponseDto;
+import com.library.management.dto.auth.LoginRequestDto;
+import com.library.management.dto.auth.RegisterRequestDto;
 import com.library.management.entity.Role;
 import com.library.management.entity.User;
 import com.library.management.enums.RoleName;
@@ -11,7 +13,8 @@ import com.library.management.repository.UserRepository;
 import com.library.management.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,13 +34,22 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDto register(RegisterRequestDto requestDto) {
-        if (userRepository.existsByEmail(requestDto.getEmail())) {
+        String normalizedEmail = normalizeEmail(requestDto.getEmail());
+        String normalizedUsername = normalizeUsername(requestDto.getUsername());
+        String normalizedFirstName = normalizeText(requestDto.getFirstName());
+        String normalizedLastName = normalizeText(requestDto.getLastName());
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw new DuplicateResourceException("User with this email already exists");
+        }
+
+        if (userRepository.existsByUsername(normalizedUsername)) {
+            throw new DuplicateResourceException("User with this username already exists");
         }
 
         RoleName roleName;
         try {
-            roleName = RoleName.valueOf(requestDto.getRole().toUpperCase());
+            roleName = RoleName.valueOf(requestDto.getRole().trim().toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new InvalidRequestException("Invalid role value");
         }
@@ -47,18 +59,27 @@ public class AuthServiceImpl implements AuthService {
                 throw new InvalidRequestException("Admin access key is required for administrator registration");
             }
 
-            if (!adminRegistrationKey.equals(requestDto.getAdminAccessKey())) {
+            if (!adminRegistrationKey.equals(requestDto.getAdminAccessKey().trim())) {
                 throw new InvalidRequestException("Invalid admin access key");
             }
+        }
+
+        if (roleName == RoleName.USER && requestDto.getAdminAccessKey() != null && !requestDto.getAdminAccessKey().isBlank()) {
+            throw new InvalidRequestException("Admin access key must not be provided for user registration");
         }
 
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new InvalidRequestException("Role not found"));
 
+        String fullName = normalizedFirstName + " " + normalizedLastName;
+
         User user = User.builder()
-                .fullName(requestDto.getFullName())
-                .email(requestDto.getEmail())
-                .password(passwordEncoder.encode(requestDto.getPassword()))
+                .firstName(normalizedFirstName)
+                .lastName(normalizedLastName)
+                .fullName(fullName)
+                .username(normalizedUsername)
+                .email(normalizedEmail)
+                .password(passwordEncoder.encode(requestDto.getPassword().trim()))
                 .role(role)
                 .isActive(true)
                 .build();
@@ -111,5 +132,17 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .role(user.getRole().getName().name())
                 .build();
+    }
+
+    private String normalizeEmail(String email) {
+        return email.trim().toLowerCase();
+    }
+
+    private String normalizeUsername(String username) {
+        return username.trim();
+    }
+
+    private String normalizeText(String value) {
+        return value.trim();
     }
 }

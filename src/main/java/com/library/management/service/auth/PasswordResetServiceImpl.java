@@ -44,8 +44,6 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     public void sendResetCode(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        // Захист від enumeration: завжди повертаємо успіх назовні,
-        // навіть якщо такого email не існує.
         if (optionalUser.isEmpty()) {
             return;
         }
