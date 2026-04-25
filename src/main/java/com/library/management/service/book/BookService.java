@@ -32,4 +32,8 @@ public interface BookService {
                                                   int size,
                                                   String sortBy,
                                                   String sortDir);
+
+    List<String> getAvailableGenres();
+
+    List<String> getAvailableLanguages();
 }

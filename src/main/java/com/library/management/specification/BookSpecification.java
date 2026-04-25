@@ -4,6 +4,8 @@ import com.library.management.entity.Book;
 import com.library.management.enums.BookStatus;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
+
 public final class BookSpecification {
 
     private BookSpecification() {
@@ -14,21 +16,50 @@ public final class BookSpecification {
                 criteriaBuilder.notEqual(root.get("status"), status);
     }
 
-    public static Specification<Book> hasGenre(String genre) {
+    public static Specification<Book> hasStatus(BookStatus status) {
         return (root, query, criteriaBuilder) -> {
-            if (genre == null || genre.isBlank()) {
+            if (status == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(criteriaBuilder.lower(root.get("genre")), genre.toLowerCase());
+            return criteriaBuilder.equal(root.get("status"), status);
         };
     }
 
-    public static Specification<Book> hasLanguage(String language) {
+    public static Specification<Book> hasGenres(List<String> genres) {
         return (root, query, criteriaBuilder) -> {
-            if (language == null || language.isBlank()) {
+            if (genres == null || genres.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(criteriaBuilder.lower(root.get("language")), language.toLowerCase());
+
+            List<String> normalizedGenres = genres.stream()
+                    .filter(genre -> genre != null && !genre.isBlank())
+                    .map(String::toLowerCase)
+                    .toList();
+
+            if (normalizedGenres.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            return criteriaBuilder.lower(root.get("genre")).in(normalizedGenres);
+        };
+    }
+
+    public static Specification<Book> hasLanguages(List<String> languages) {
+        return (root, query, criteriaBuilder) -> {
+            if (languages == null || languages.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            List<String> normalizedLanguages = languages.stream()
+                    .filter(language -> language != null && !language.isBlank())
+                    .map(String::toLowerCase)
+                    .toList();
+
+            if (normalizedLanguages.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            return criteriaBuilder.lower(root.get("language")).in(normalizedLanguages);
         };
     }
 
@@ -54,7 +85,9 @@ public final class BookSpecification {
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("authorSurname")), pattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("authorInitials")), pattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("genre")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("language")), pattern)
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("language")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("publisher")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("isbn")), pattern)
             );
         };
     }

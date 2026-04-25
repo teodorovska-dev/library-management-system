@@ -25,6 +25,11 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
            AND (
                 LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(b.authorSurname) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(b.authorInitials) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(b.genre) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(b.language) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(b.publisher) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(b.isbn) LIKE LOWER(CONCAT('%', :keyword, '%'))
            )
            """)
     Page<Book> searchBooks(
@@ -32,4 +37,22 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
             @Param("keyword") String keyword,
             Pageable pageable
     );
+
+    @Query("""
+           SELECT DISTINCT b.genre FROM Book b
+           WHERE b.genre IS NOT NULL
+           AND b.genre <> ''
+           AND b.status <> :status
+           ORDER BY b.genre ASC
+           """)
+    List<String> findDistinctGenres(@Param("status") BookStatus status);
+
+    @Query("""
+           SELECT DISTINCT b.language FROM Book b
+           WHERE b.language IS NOT NULL
+           AND b.language <> ''
+           AND b.status <> :status
+           ORDER BY b.language ASC
+           """)
+    List<String> findDistinctLanguages(@Param("status") BookStatus status);
 }

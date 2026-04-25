@@ -1,7 +1,9 @@
 package com.library.management.service.book;
 
+import com.library.management.dto.book.BookFilterRequestDto;
 import com.library.management.dto.book.BookRequestDto;
 import com.library.management.dto.book.BookResponseDto;
+import com.library.management.dto.common.PagedResponseDto;
 import com.library.management.entity.Book;
 import com.library.management.entity.User;
 import com.library.management.enums.BookStatus;
@@ -9,17 +11,14 @@ import com.library.management.exception.ResourceNotFoundException;
 import com.library.management.mapper.BookMapper;
 import com.library.management.repository.BookRepository;
 import com.library.management.security.service.CurrentUserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import com.library.management.dto.common.PagedResponseDto;
-import org.springframework.data.domain.*;
-import com.library.management.dto.book.BookFilterRequestDto;
 import com.library.management.specification.BookSpecification;
 import com.library.management.util.BookSortFields;
 import com.library.management.util.PageableUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -98,20 +97,9 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
-    private Book findBookByIdOrThrow(Long id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Book with id " + id + " not found"));
-    }
-
     @Override
     public PagedResponseDto<BookResponseDto> getBooksPaginated(int page, int size, String sortBy, String sortDir) {
-        Pageable pageable = PageableUtil.buildPageable(
-                page,
-                size,
-                sortBy,
-                sortDir,
-                BookSortFields.ALLOWED_SORT_FIELDS
-        );
+        Pageable pageable = buildBookPageable(page, size, sortBy, sortDir);
 
         Page<Book> booksPage = bookRepository.findAllByStatusNot(BookStatus.WRITTEN_OFF, pageable);
 
@@ -120,13 +108,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public PagedResponseDto<BookResponseDto> searchBooks(String keyword, int page, int size, String sortBy, String sortDir) {
-        Pageable pageable = PageableUtil.buildPageable(
-                page,
-                size,
-                sortBy,
-                sortDir,
-                BookSortFields.ALLOWED_SORT_FIELDS
-        );
+        Pageable pageable = buildBookPageable(page, size, sortBy, sortDir);
 
         Page<Book> booksPage = bookRepository.searchBooks(BookStatus.WRITTEN_OFF, keyword, pageable);
 
@@ -139,24 +121,46 @@ public class BookServiceImpl implements BookService {
                                                          int size,
                                                          String sortBy,
                                                          String sortDir) {
-        Pageable pageable = PageableUtil.buildPageable(
-                page,
-                size,
-                sortBy,
-                sortDir,
-                BookSortFields.ALLOWED_SORT_FIELDS
-        );
+        Pageable pageable = buildBookPageable(page, size, sortBy, sortDir);
 
         Specification<Book> specification = Specification
                 .where(BookSpecification.statusNot(BookStatus.WRITTEN_OFF))
                 .and(BookSpecification.containsKeyword(filterRequestDto.getKeyword()))
-                .and(BookSpecification.hasGenre(filterRequestDto.getGenre()))
-                .and(BookSpecification.hasLanguage(filterRequestDto.getLanguage()))
+                .and(BookSpecification.hasGenres(filterRequestDto.getGenres()))
+                .and(BookSpecification.hasLanguages(filterRequestDto.getLanguages()))
+                .and(BookSpecification.hasStatus(filterRequestDto.getStatus()))
                 .and(BookSpecification.hasPublicationYear(filterRequestDto.getPublicationYear()));
 
         Page<Book> booksPage = bookRepository.findAll(specification, pageable);
 
         return mapToPagedResponse(booksPage);
+    }
+
+    private Pageable buildBookPageable(int page, int size, String sortBy, String sortDir) {
+        String resolvedSortBy = BookSortFields.resolveSortField(sortBy);
+
+        return PageableUtil.buildPageable(
+                page,
+                size,
+                resolvedSortBy,
+                sortDir,
+                BookSortFields.ALLOWED_BACKEND_SORT_FIELDS
+        );
+    }
+
+    @Override
+    public List<String> getAvailableGenres() {
+        return bookRepository.findDistinctGenres(BookStatus.WRITTEN_OFF);
+    }
+
+    @Override
+    public List<String> getAvailableLanguages() {
+        return bookRepository.findDistinctLanguages(BookStatus.WRITTEN_OFF);
+    }
+
+    private Book findBookByIdOrThrow(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book with id " + id + " not found"));
     }
 
     private PagedResponseDto<BookResponseDto> mapToPagedResponse(Page<Book> booksPage) {

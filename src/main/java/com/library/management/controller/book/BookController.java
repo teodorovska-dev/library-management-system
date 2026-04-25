@@ -1,16 +1,16 @@
 package com.library.management.controller.book;
 
+import com.library.management.dto.book.BookFilterRequestDto;
 import com.library.management.dto.book.BookRequestDto;
 import com.library.management.dto.book.BookResponseDto;
 import com.library.management.dto.common.PagedResponseDto;
-import com.library.management.dto.book.BookFilterRequestDto;
+import com.library.management.enums.BookStatus;
 import com.library.management.service.book.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.util.List;
 
@@ -34,6 +34,16 @@ public class BookController {
         return bookService.getAllBooks();
     }
 
+    @GetMapping("/genres")
+    public List<String> getAvailableGenres() {
+        return bookService.getAvailableGenres();
+    }
+
+    @GetMapping("/languages")
+    public List<String> getAvailableLanguages() {
+        return bookService.getAvailableLanguages();
+    }
+
     @GetMapping("/{id}")
     public BookResponseDto getBookById(@PathVariable Long id) {
         return bookService.getBookById(id);
@@ -53,20 +63,10 @@ public class BookController {
         bookService.writeOffBook(id);
     }
 
-    @GetMapping("/sorted/author")
-    public List<BookResponseDto> getBooksSortedByAuthor() {
-        return bookService.getBooksSortedByAuthor();
-    }
-
-    @GetMapping("/sorted/year")
-    public List<BookResponseDto> getBooksSortedByPublicationYear() {
-        return bookService.getBooksSortedByPublicationYear();
-    }
-
     @GetMapping("/paged")
     public PagedResponseDto<BookResponseDto> getBooksPaginated(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "title") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir
     ) {
@@ -77,7 +77,7 @@ public class BookController {
     public PagedResponseDto<BookResponseDto> searchBooks(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "title") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir
     ) {
@@ -87,18 +87,20 @@ public class BookController {
     @GetMapping("/filter")
     public PagedResponseDto<BookResponseDto> filterBooks(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String genre,
-            @RequestParam(required = false) String language,
+            @RequestParam(required = false) List<String> genres,
+            @RequestParam(required = false) List<String> languages,
+            @RequestParam(required = false) BookStatus status,
             @RequestParam(required = false) Integer publicationYear,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "title") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir
     ) {
         BookFilterRequestDto filterRequestDto = BookFilterRequestDto.builder()
                 .keyword(keyword)
-                .genre(genre)
-                .language(language)
+                .genres(genres)
+                .languages(languages)
+                .status(status)
                 .publicationYear(publicationYear)
                 .build();
 
