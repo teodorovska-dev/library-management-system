@@ -15,11 +15,8 @@ public class BookRequestDto {
     @NotBlank(message = "Title is required")
     private String title;
 
-    @NotBlank(message = "Author surname is required")
-    private String authorSurname;
-
-    @NotBlank(message = "Author initials are required")
-    private String authorInitials;
+    @NotBlank(message = "Author full name is required")
+    private String authorFullName;
 
     @NotNull(message = "Publication year is required")
     @Min(value = 1, message = "Publication year must be greater than 0")
@@ -30,14 +27,9 @@ public class BookRequestDto {
     private Integer copiesCount;
 
     private String genre;
-
     private String language;
-
     private String isbn;
-
     private String publisher;
-
     private String description;
-
     private String coverImageUrl;
 }

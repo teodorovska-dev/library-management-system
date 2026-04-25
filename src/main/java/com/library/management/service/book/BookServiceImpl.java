@@ -83,7 +83,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookResponseDto> getBooksSortedByAuthor() {
-        return bookRepository.findAllByStatusNotOrderByAuthorSurnameAsc(BookStatus.WRITTEN_OFF)
+        return bookRepository.findAllByStatusNotOrderByAuthorFullNameAsc(BookStatus.WRITTEN_OFF)
                 .stream()
                 .map(bookMapper::toResponseDto)
                 .toList();

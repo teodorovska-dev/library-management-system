@@ -13,7 +13,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
 
     List<Book> findByStatus(BookStatus status);
 
-    List<Book> findAllByStatusNotOrderByAuthorSurnameAsc(BookStatus status);
+    List<Book> findAllByStatusNotOrderByAuthorFullNameAsc(BookStatus status);
 
     List<Book> findAllByStatusNotOrderByPublicationYearAsc(BookStatus status);
 
@@ -24,8 +24,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
            WHERE b.status <> :status
            AND (
                 LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.authorSurname) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.authorInitials) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(b.authorFullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(b.genre) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(b.language) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(b.publisher) LIKE LOWER(CONCAT('%', :keyword, '%'))

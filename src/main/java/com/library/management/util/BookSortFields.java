@@ -10,7 +10,7 @@ public final class BookSortFields {
 
     public static final Map<String, String> SORT_FIELD_MAPPING = Map.of(
             "title", "title",
-            "author", "authorSurname",
+            "author", "authorFullName",
             "year", "publicationYear",
             "category", "genre",
             "language", "language",

@@ -22,11 +22,8 @@ public class Book {
     @Column(nullable = false, length = 255)
     private String title;
 
-    @Column(name = "author_surname", nullable = false, length = 100)
-    private String authorSurname;
-
-    @Column(name = "author_initials", nullable = false, length = 20)
-    private String authorInitials;
+    @Column(name = "author_full_name", nullable = false, length = 150)
+    private String authorFullName;
 
     @Column(name = "publication_year", nullable = false)
     private Integer publicationYear;

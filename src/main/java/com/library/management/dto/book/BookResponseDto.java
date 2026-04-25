@@ -14,8 +14,7 @@ public class BookResponseDto {
 
     private Long id;
     private String title;
-    private String authorSurname;
-    private String authorInitials;
+    private String authorFullName;
     private Integer publicationYear;
     private Integer copiesCount;
     private String genre;

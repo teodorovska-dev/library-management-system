@@ -82,8 +82,7 @@ public final class BookSpecification {
 
             return criteriaBuilder.or(
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("authorSurname")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("authorInitials")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("authorFullName")), pattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("genre")), pattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("language")), pattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("publisher")), pattern),

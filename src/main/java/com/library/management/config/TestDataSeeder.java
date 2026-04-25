@@ -65,8 +65,7 @@ public class TestDataSeeder implements CommandLineRunner {
 
         bookRepository.save(Book.builder()
                 .title("Clean Code")
-                .authorSurname("Martin")
-                .authorInitials("R.C.")
+                .authorFullName("Robert C. Martin")
                 .publicationYear(2008)
                 .copiesCount(4)
                 .genre("Programming")
@@ -81,8 +80,7 @@ public class TestDataSeeder implements CommandLineRunner {
 
         bookRepository.save(Book.builder()
                 .title("The Psychology of Money")
-                .authorSurname("Housel")
-                .authorInitials("M.")
+                .authorFullName("Morgan Housel")
                 .publicationYear(2020)
                 .copiesCount(5)
                 .genre("Finance")
@@ -97,8 +95,7 @@ public class TestDataSeeder implements CommandLineRunner {
 
         bookRepository.save(Book.builder()
                 .title("Atomic Habits")
-                .authorSurname("Clear")
-                .authorInitials("J.")
+                .authorFullName("James Clear")
                 .publicationYear(2018)
                 .copiesCount(2)
                 .genre("Self-development")

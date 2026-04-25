@@ -16,8 +16,7 @@ public class BookMapper {
 
         Book book = new Book();
         book.setTitle(dto.getTitle());
-        book.setAuthorSurname(dto.getAuthorSurname());
-        book.setAuthorInitials(dto.getAuthorInitials());
+        book.setAuthorFullName(dto.getAuthorFullName());
         book.setPublicationYear(dto.getPublicationYear());
         book.setCopiesCount(dto.getCopiesCount());
         book.setGenre(dto.getGenre());
@@ -44,8 +43,7 @@ public class BookMapper {
         return BookResponseDto.builder()
                 .id(book.getId())
                 .title(book.getTitle())
-                .authorSurname(book.getAuthorSurname())
-                .authorInitials(book.getAuthorInitials())
+                .authorFullName(book.getAuthorFullName())
                 .publicationYear(book.getPublicationYear())
                 .copiesCount(book.getCopiesCount())
                 .genre(book.getGenre())
@@ -66,8 +64,7 @@ public class BookMapper {
 
     public void updateEntityFromDto(BookRequestDto dto, Book book) {
         book.setTitle(dto.getTitle());
-        book.setAuthorSurname(dto.getAuthorSurname());
-        book.setAuthorInitials(dto.getAuthorInitials());
+        book.setAuthorFullName(dto.getAuthorFullName());
         book.setPublicationYear(dto.getPublicationYear());
         book.setCopiesCount(dto.getCopiesCount());
         book.setGenre(dto.getGenre());
