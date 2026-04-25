@@ -54,4 +54,18 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
            ORDER BY b.language ASC
            """)
     List<String> findDistinctLanguages(@Param("status") BookStatus status);
+
+    long countByStatus(com.library.management.enums.BookStatus status);
+
+    @Query("SELECT COUNT(DISTINCT b.title) FROM Book b WHERE b.status <> :status")
+    long countDistinctTitles(@Param("status") BookStatus status);
+
+    @Query("SELECT COUNT(DISTINCT b.authorFullName) FROM Book b WHERE b.status <> :status")
+    long countDistinctAuthors(@Param("status") BookStatus status);
+
+    @Query("SELECT COALESCE(SUM(b.copiesCount), 0) FROM Book b WHERE b.status = :status")
+    long countAvailableCopies(@Param("status") BookStatus status);
+
+    @Query("SELECT COUNT(b) FROM Book b WHERE b.status <> :status")
+    long countActiveBooks(@Param("status") BookStatus status);
 }
