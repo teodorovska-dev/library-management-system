@@ -49,6 +49,9 @@ public class Book {
     @Column(name = "cover_image_url", columnDefinition = "TEXT")
     private String coverImageUrl;
 
+    @Column(name = "splash_color", length = 20)
+    private String splashColor;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private BookStatus status;

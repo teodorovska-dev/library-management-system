@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/api-docs/**",
                                 "/swagger-ui.html",
-                                "/swagger-ui/**"
+                                "/swagger-ui/**",
+                                "/uploads/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasRole("ADMIN")

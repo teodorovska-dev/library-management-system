@@ -23,6 +23,7 @@ public class BookResponseDto {
     private String publisher;
     private String description;
     private String coverImageUrl;
+    private String splashColor;
     private BookStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -32,4 +32,5 @@ public class BookRequestDto {
     private String publisher;
     private String description;
     private String coverImageUrl;
+    private String splashColor;
 }
