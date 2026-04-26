@@ -9,9 +9,9 @@ import lombok.*;
 @Builder
 public class AdminDashboardStatsDto {
 
-    private long totalBooks;
-    private long totalTitles;
-    private long totalAuthors;
-    private long writtenOffBooks;
-    private long availableCopies;
+    private DashboardTrendDto totalBooks;
+    private DashboardTrendDto totalTitles;
+    private DashboardTrendDto totalAuthors;
+    private DashboardTrendDto writtenOffBooks;
+    private DashboardTrendDto availableCopies;
 }

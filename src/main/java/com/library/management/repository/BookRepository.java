@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
@@ -18,6 +19,8 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     List<Book> findAllByStatusNotOrderByPublicationYearAsc(BookStatus status);
 
     Page<Book> findAllByStatusNot(BookStatus status, Pageable pageable);
+
+    long countByStatus(BookStatus status);
 
     @Query("""
            SELECT b FROM Book b
@@ -55,17 +58,35 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
            """)
     List<String> findDistinctLanguages(@Param("status") BookStatus status);
 
-    long countByStatus(com.library.management.enums.BookStatus status);
+    @Query("SELECT COUNT(b) FROM Book b WHERE b.status <> :status")
+    long countActiveBooks(@Param("status") BookStatus status);
+
+    @Query("SELECT COUNT(b) FROM Book b WHERE b.status <> :status AND b.createdAt < :date")
+    long countActiveBooksBefore(@Param("status") BookStatus status,
+                                @Param("date") LocalDateTime date);
 
     @Query("SELECT COUNT(DISTINCT b.title) FROM Book b WHERE b.status <> :status")
     long countDistinctTitles(@Param("status") BookStatus status);
 
+    @Query("SELECT COUNT(DISTINCT b.title) FROM Book b WHERE b.status <> :status AND b.createdAt < :date")
+    long countDistinctTitlesBefore(@Param("status") BookStatus status,
+                                   @Param("date") LocalDateTime date);
+
     @Query("SELECT COUNT(DISTINCT b.authorFullName) FROM Book b WHERE b.status <> :status")
     long countDistinctAuthors(@Param("status") BookStatus status);
+
+    @Query("SELECT COUNT(DISTINCT b.authorFullName) FROM Book b WHERE b.status <> :status AND b.createdAt < :date")
+    long countDistinctAuthorsBefore(@Param("status") BookStatus status,
+                                    @Param("date") LocalDateTime date);
+
+    @Query("SELECT COUNT(b) FROM Book b WHERE b.status = :status AND b.updatedAt < :date")
+    long countByStatusBefore(@Param("status") BookStatus status,
+                             @Param("date") LocalDateTime date);
 
     @Query("SELECT COALESCE(SUM(b.copiesCount), 0) FROM Book b WHERE b.status = :status")
     long countAvailableCopies(@Param("status") BookStatus status);
 
-    @Query("SELECT COUNT(b) FROM Book b WHERE b.status <> :status")
-    long countActiveBooks(@Param("status") BookStatus status);
+    @Query("SELECT COALESCE(SUM(b.copiesCount), 0) FROM Book b WHERE b.status = :status AND b.updatedAt < :date")
+    long countAvailableCopiesBefore(@Param("status") BookStatus status,
+                                    @Param("date") LocalDateTime date);
 }
