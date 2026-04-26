@@ -44,6 +44,14 @@ public class BookController {
         return bookService.getAvailableLanguages();
     }
 
+    @GetMapping("/trending")
+    public PagedResponseDto<BookResponseDto> getTrendingBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size
+    ) {
+        return bookService.getTrendingBooks(page, size);
+    }
+
     @GetMapping("/{id}")
     public BookResponseDto getBookById(@PathVariable Long id) {
         return bookService.getBookById(id);

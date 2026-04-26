@@ -58,6 +58,15 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
            """)
     List<String> findDistinctLanguages(@Param("status") BookStatus status);
 
+    @Query("""
+       SELECT b FROM Book b
+       LEFT JOIN Favorite f ON f.book = b
+       WHERE b.status <> :status
+       GROUP BY b
+       ORDER BY COUNT(f.id) DESC, b.createdAt DESC, b.id DESC
+       """)
+    Page<Book> findTrendingBooks(@Param("status") BookStatus status, Pageable pageable);
+
     @Query("SELECT COUNT(b) FROM Book b WHERE b.status <> :status")
     long countActiveBooks(@Param("status") BookStatus status);
 

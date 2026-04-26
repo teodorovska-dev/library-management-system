@@ -173,4 +173,19 @@ public class BookServiceImpl implements BookService {
                 .last(booksPage.isLast())
                 .build();
     }
+
+    @Override
+    public PagedResponseDto<BookResponseDto> getTrendingBooks(int page, int size) {
+        Pageable pageable = PageableUtil.buildPageable(
+                page,
+                size,
+                "createdAt",
+                "desc",
+                BookSortFields.ALLOWED_BACKEND_SORT_FIELDS
+        );
+
+        Page<Book> booksPage = bookRepository.findTrendingBooks(BookStatus.WRITTEN_OFF, pageable);
+
+        return mapToPagedResponse(booksPage);
+    }
 }

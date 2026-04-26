@@ -33,6 +33,8 @@ public interface BookService {
                                                   String sortBy,
                                                   String sortDir);
 
+    PagedResponseDto<BookResponseDto> getTrendingBooks(int page, int size);
+
     List<String> getAvailableGenres();
 
     List<String> getAvailableLanguages();
