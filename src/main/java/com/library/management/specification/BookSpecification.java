@@ -2,6 +2,8 @@ package com.library.management.specification;
 
 import com.library.management.entity.Book;
 import com.library.management.enums.BookStatus;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -21,6 +23,7 @@ public final class BookSpecification {
             if (status == null) {
                 return criteriaBuilder.conjunction();
             }
+
             return criteriaBuilder.equal(root.get("status"), status);
         };
     }
@@ -40,7 +43,11 @@ public final class BookSpecification {
                 return criteriaBuilder.conjunction();
             }
 
-            return criteriaBuilder.lower(root.get("genre")).in(normalizedGenres);
+            query.distinct(true);
+
+            Join<Book, String> genreJoin = root.join("genres");
+
+            return criteriaBuilder.lower(genreJoin).in(normalizedGenres);
         };
     }
 
@@ -59,7 +66,11 @@ public final class BookSpecification {
                 return criteriaBuilder.conjunction();
             }
 
-            return criteriaBuilder.lower(root.get("language")).in(normalizedLanguages);
+            query.distinct(true);
+
+            Join<Book, String> languageJoin = root.join("languages");
+
+            return criteriaBuilder.lower(languageJoin).in(normalizedLanguages);
         };
     }
 
@@ -68,6 +79,7 @@ public final class BookSpecification {
             if (publicationYear == null) {
                 return criteriaBuilder.conjunction();
             }
+
             return criteriaBuilder.equal(root.get("publicationYear"), publicationYear);
         };
     }
@@ -80,13 +92,33 @@ public final class BookSpecification {
 
             String pattern = "%" + keyword.toLowerCase() + "%";
 
+            Subquery<String> genreSubquery = query.subquery(String.class);
+            var genreBookRoot = genreSubquery.from(Book.class);
+            Join<Book, String> genreJoin = genreBookRoot.join("genres");
+
+            genreSubquery.select(genreJoin)
+                    .where(
+                            criteriaBuilder.equal(genreBookRoot.get("id"), root.get("id")),
+                            criteriaBuilder.like(criteriaBuilder.lower(genreJoin), pattern)
+                    );
+
+            Subquery<String> languageSubquery = query.subquery(String.class);
+            var languageBookRoot = languageSubquery.from(Book.class);
+            Join<Book, String> languageJoin = languageBookRoot.join("languages");
+
+            languageSubquery.select(languageJoin)
+                    .where(
+                            criteriaBuilder.equal(languageBookRoot.get("id"), root.get("id")),
+                            criteriaBuilder.like(criteriaBuilder.lower(languageJoin), pattern)
+                    );
+
             return criteriaBuilder.or(
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), pattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("authorFullName")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("genre")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("language")), pattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("publisher")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("isbn")), pattern)
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("isbn")), pattern),
+                    criteriaBuilder.exists(genreSubquery),
+                    criteriaBuilder.exists(languageSubquery)
             );
         };
     }

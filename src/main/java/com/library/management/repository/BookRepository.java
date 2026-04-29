@@ -23,17 +23,23 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     long countByStatus(BookStatus status);
 
     @Query("""
-           SELECT b FROM Book b
-           WHERE b.status <> :status
-           AND (
-                LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.authorFullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.genre) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.language) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.publisher) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.isbn) LIKE LOWER(CONCAT('%', :keyword, '%'))
-           )
-           """)
+       SELECT b FROM Book b
+       WHERE b.status <> :status
+       AND (
+            LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(b.authorFullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(b.publisher) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(b.isbn) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR EXISTS (
+                SELECT g FROM b.genres g
+                WHERE LOWER(g) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            )
+            OR EXISTS (
+                SELECT l FROM b.languages l
+                WHERE LOWER(l) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            )
+       )
+       """)
     Page<Book> searchBooks(
             @Param("status") BookStatus status,
             @Param("keyword") String keyword,
@@ -41,21 +47,23 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     );
 
     @Query("""
-           SELECT DISTINCT b.genre FROM Book b
-           WHERE b.genre IS NOT NULL
-           AND b.genre <> ''
-           AND b.status <> :status
-           ORDER BY b.genre ASC
-           """)
+       SELECT DISTINCT g FROM Book b
+       JOIN b.genres g
+       WHERE g IS NOT NULL
+       AND g <> ''
+       AND b.status <> :status
+       ORDER BY g ASC
+       """)
     List<String> findDistinctGenres(@Param("status") BookStatus status);
 
     @Query("""
-           SELECT DISTINCT b.language FROM Book b
-           WHERE b.language IS NOT NULL
-           AND b.language <> ''
-           AND b.status <> :status
-           ORDER BY b.language ASC
-           """)
+       SELECT DISTINCT l FROM Book b
+       JOIN b.languages l
+       WHERE l IS NOT NULL
+       AND l <> ''
+       AND b.status <> :status
+       ORDER BY l ASC
+       """)
     List<String> findDistinctLanguages(@Param("status") BookStatus status);
 
     @Query("""

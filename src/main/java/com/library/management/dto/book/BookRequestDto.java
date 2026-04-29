@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,8 +27,8 @@ public class BookRequestDto {
     @Min(value = 0, message = "Copies count cannot be negative")
     private Integer copiesCount;
 
-    private String genre;
-    private String language;
+    private List<String> genres;
+    private List<String> languages;
     private String isbn;
     private String publisher;
     private String description;

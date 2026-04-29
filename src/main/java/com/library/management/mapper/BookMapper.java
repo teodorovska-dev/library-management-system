@@ -19,8 +19,8 @@ public class BookMapper {
         book.setAuthorFullName(dto.getAuthorFullName());
         book.setPublicationYear(dto.getPublicationYear());
         book.setCopiesCount(dto.getCopiesCount());
-        book.setGenre(dto.getGenre());
-        book.setLanguage(dto.getLanguage());
+        book.setGenres(dto.getGenres());
+        book.setLanguages(dto.getLanguages());
         book.setIsbn(dto.getIsbn());
         book.setPublisher(dto.getPublisher());
         book.setDescription(dto.getDescription());
@@ -51,8 +51,8 @@ public class BookMapper {
                 .authorFullName(book.getAuthorFullName())
                 .publicationYear(book.getPublicationYear())
                 .copiesCount(book.getCopiesCount())
-                .genre(book.getGenre())
-                .language(book.getLanguage())
+                .genres(book.getGenres())
+                .languages(book.getLanguages())
                 .isbn(book.getIsbn())
                 .publisher(book.getPublisher())
                 .description(book.getDescription())
@@ -73,8 +73,8 @@ public class BookMapper {
         book.setAuthorFullName(dto.getAuthorFullName());
         book.setPublicationYear(dto.getPublicationYear());
         book.setCopiesCount(dto.getCopiesCount());
-        book.setGenre(dto.getGenre());
-        book.setLanguage(dto.getLanguage());
+        book.setGenres(dto.getGenres());
+        book.setLanguages(dto.getLanguages());
         book.setIsbn(dto.getIsbn());
         book.setPublisher(dto.getPublisher());
         book.setDescription(dto.getDescription());

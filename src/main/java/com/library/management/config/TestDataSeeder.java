@@ -13,6 +13,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class TestDataSeeder implements CommandLineRunner {
@@ -68,8 +70,8 @@ public class TestDataSeeder implements CommandLineRunner {
                 .authorFullName("Robert C. Martin")
                 .publicationYear(2008)
                 .copiesCount(4)
-                .genre("Programming")
-                .language("English")
+                .genres(List.of("Programming", "Software Engineering"))
+                .languages(List.of("English"))
                 .isbn("9780132350884")
                 .publisher("Prentice Hall")
                 .description("A handbook of agile software craftsmanship.")
@@ -83,8 +85,8 @@ public class TestDataSeeder implements CommandLineRunner {
                 .authorFullName("Morgan Housel")
                 .publicationYear(2020)
                 .copiesCount(5)
-                .genre("Finance")
-                .language("English")
+                .genres(List.of("Finance", "Psychology", "Business"))
+                .languages(List.of("English"))
                 .isbn("9780857197689")
                 .publisher("Harriman House")
                 .description("A book about financial behavior.")
@@ -98,8 +100,8 @@ public class TestDataSeeder implements CommandLineRunner {
                 .authorFullName("James Clear")
                 .publicationYear(2018)
                 .copiesCount(2)
-                .genre("Self-development")
-                .language("English")
+                .genres(List.of("Self-Development", "Psychology"))
+                .languages(List.of("English"))
                 .isbn("9780735211292")
                 .publisher("Avery")
                 .description("A practical guide to habit formation.")

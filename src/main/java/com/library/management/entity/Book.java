@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "books")
@@ -31,11 +32,21 @@ public class Book {
     @Column(name = "copies_count", nullable = false)
     private Integer copiesCount;
 
-    @Column(length = 100)
-    private String genre;
+    @ElementCollection
+    @CollectionTable(
+            name = "book_genres",
+            joinColumns = @JoinColumn(name = "book_id")
+    )
+    @Column(name = "genre", length = 100)
+    private List<String> genres;
 
-    @Column(length = 100)
-    private String language;
+    @ElementCollection
+    @CollectionTable(
+            name = "book_languages",
+            joinColumns = @JoinColumn(name = "book_id")
+    )
+    @Column(name = "language", length = 100)
+    private List<String> languages;
 
     @Column(length = 50)
     private String isbn;

@@ -4,6 +4,7 @@ import com.library.management.enums.BookStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,8 +18,8 @@ public class BookResponseDto {
     private String authorFullName;
     private Integer publicationYear;
     private Integer copiesCount;
-    private String genre;
-    private String language;
+    private List<String> genres;
+    private List<String> languages;
     private String isbn;
     private String publisher;
     private String description;
