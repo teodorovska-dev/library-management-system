@@ -9,11 +9,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+import com.library.management.repository.UserRepository;
+
 @Service
 @RequiredArgsConstructor
 public class AdminDashboardServiceImpl implements AdminDashboardService {
 
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
     @Override
     public AdminDashboardStatsDto getStats() {
@@ -34,12 +37,15 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         long currentAvailableCopies = bookRepository.countAvailableCopies(BookStatus.AVAILABLE);
         long previousAvailableCopies = bookRepository.countAvailableCopiesBefore(BookStatus.AVAILABLE, previousMonthPoint);
 
+        long currentTotalUsers = userRepository.count();
+
         return AdminDashboardStatsDto.builder()
                 .totalBooks(buildTrend(currentTotalBooks, previousTotalBooks))
                 .totalTitles(buildTrend(currentTotalTitles, previousTotalTitles))
                 .totalAuthors(buildTrend(currentTotalAuthors, previousTotalAuthors))
                 .writtenOffBooks(buildTrend(currentWrittenOffBooks, previousWrittenOffBooks))
                 .availableCopies(buildTrend(currentAvailableCopies, previousAvailableCopies))
+                .totalUsers(buildTrend(currentTotalUsers, currentTotalUsers))
                 .build();
     }
 

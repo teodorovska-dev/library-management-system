@@ -14,4 +14,5 @@ public class AdminDashboardStatsDto {
     private DashboardTrendDto totalAuthors;
     private DashboardTrendDto writtenOffBooks;
     private DashboardTrendDto availableCopies;
+    private DashboardTrendDto totalUsers;
 }
