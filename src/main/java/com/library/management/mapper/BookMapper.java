@@ -25,7 +25,11 @@ public class BookMapper {
         book.setPublisher(dto.getPublisher());
         book.setDescription(dto.getDescription());
         book.setCoverImageUrl(dto.getCoverImageUrl());
-        book.setSplashColor(dto.getSplashColor());
+        book.setSplashColor(
+                dto.getSplashColor() != null && !dto.getSplashColor().isBlank()
+                        ? dto.getSplashColor()
+                        : "#d8ddd2"
+        );
 
         if (dto.getCopiesCount() != null && dto.getCopiesCount() == 0) {
             book.setStatus(BookStatus.OUT_OF_STOCK);

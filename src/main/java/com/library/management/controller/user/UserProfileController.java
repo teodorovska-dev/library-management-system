@@ -26,4 +26,9 @@ public class UserProfileController {
     ) {
         return userProfileService.updateCurrentUserProfile(requestDto);
     }
+
+    @DeleteMapping("/me/avatar")
+    public UserProfileResponseDto deleteCurrentUserAvatar() {
+        return userProfileService.deleteCurrentUserAvatar();
+    }
 }
