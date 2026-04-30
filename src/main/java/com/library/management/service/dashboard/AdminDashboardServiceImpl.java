@@ -53,8 +53,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         if (previousValue == 0) {
             return DashboardTrendDto.builder()
                     .value(currentValue)
-                    .trend("neutral")
-                    .change(0)
+                    .trend(currentValue > 0 ? "increase" : "neutral")
+                    .change(currentValue > 0 ? 100 : 0)
                     .build();
         }
 
