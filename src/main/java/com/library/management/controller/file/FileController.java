@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class FileController {
 
     private final FileStorageService fileStorageService;

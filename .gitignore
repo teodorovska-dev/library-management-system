@@ -49,3 +49,7 @@ Thumbs.db
 # Node (frontend later)
 node_modules/
 dist/
+
+# Uploaded files
+uploads/
+error-log.txt

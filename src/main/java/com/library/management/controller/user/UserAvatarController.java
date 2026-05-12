@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/users/me/avatar")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class UserAvatarController {
 
     private final UserAvatarService userAvatarService;

@@ -1,6 +1,7 @@
 package com.library.management.service.file;
 
 import com.library.management.dto.file.FileUploadResponseDto;
+import com.library.management.exception.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,38 +10,38 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class FileStorageService {
+
+    private static final List<String> ALLOWED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".webp");
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
     public FileUploadResponseDto saveBookCover(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            return FileUploadResponseDto.builder()
-                    .url("")
-                    .splashColor("#d8ddd2")
-                    .build();
+            throw new InvalidRequestException("File is required");
+        }
+
+        String originalName = file.getOriginalFilename();
+        String extension = getFileExtension(originalName);
+
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new InvalidRequestException("Only JPG, JPEG, PNG and WEBP images are allowed");
         }
 
         try {
             String splashColor = extractDominantColor(file);
 
-            String originalName = file.getOriginalFilename();
-            String extension = "";
-
-            if (originalName != null && originalName.contains(".")) {
-                extension = originalName.substring(originalName.lastIndexOf("."));
-            }
-
             String fileName = UUID.randomUUID() + extension;
-            Path coversPath = Paths.get(uploadDir, "covers");
+            Path coversPath = Paths.get(uploadDir, "covers").toAbsolutePath().normalize();
 
             Files.createDirectories(coversPath);
 
-            Path targetPath = coversPath.resolve(fileName);
+            Path targetPath = coversPath.resolve(fileName).normalize();
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
             return FileUploadResponseDto.builder()
@@ -53,11 +54,19 @@ public class FileStorageService {
         }
     }
 
+    private String getFileExtension(String originalName) {
+        if (originalName == null || !originalName.contains(".")) {
+            throw new InvalidRequestException("File extension is missing");
+        }
+
+        return originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+    }
+
     private String extractDominantColor(MultipartFile file) throws IOException {
         BufferedImage image = ImageIO.read(file.getInputStream());
 
         if (image == null) {
-            return "#d8ddd2";
+            throw new InvalidRequestException("Uploaded file is not a valid image");
         }
 
         long red = 0;
@@ -71,8 +80,8 @@ public class FileStorageService {
         for (int y = 0; y < image.getHeight(); y += stepY) {
             for (int x = 0; x < image.getWidth(); x += stepX) {
                 int rgb = image.getRGB(x, y);
-
                 int alpha = (rgb >> 24) & 0xff;
+
                 if (alpha < 128) {
                     continue;
                 }
@@ -88,10 +97,11 @@ public class FileStorageService {
             return "#d8ddd2";
         }
 
-        int avgRed = (int) (red / count);
-        int avgGreen = (int) (green / count);
-        int avgBlue = (int) (blue / count);
-
-        return String.format("#%02x%02x%02x", avgRed, avgGreen, avgBlue);
+        return String.format(
+                "#%02x%02x%02x",
+                (int) (red / count),
+                (int) (green / count),
+                (int) (blue / count)
+        );
     }
 }

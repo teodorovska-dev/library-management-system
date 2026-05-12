@@ -106,14 +106,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDto login(LoginRequestDto requestDto) {
+        String normalizedEmail = normalizeEmail(requestDto.getEmail());
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        requestDto.getEmail(),
+                        normalizedEmail,
                         requestDto.getPassword()
                 )
         );
 
-        User user = userRepository.findByEmail(requestDto.getEmail())
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new InvalidRequestException("Invalid email or password"));
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User
