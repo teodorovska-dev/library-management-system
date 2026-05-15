@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -40,12 +42,17 @@ public class FileStorageService {
             throw new InvalidRequestException("Only JPG, JPEG, PNG and WEBP images are allowed");
         }
 
+        Path tempFile = null;
+
         try {
             String splashColor = extractDominantColor(file);
             String publicId = "library-management/book-covers/" + UUID.randomUUID();
 
+            tempFile = Files.createTempFile("book-cover-", extension);
+            file.transferTo(tempFile.toFile());
+
             Map uploadResult = cloudinary.uploader().upload(
-                    file.getInputStream(),
+                    tempFile.toFile(),
                     ObjectUtils.asMap(
                             "public_id", publicId,
                             "resource_type", "image",
@@ -63,6 +70,15 @@ public class FileStorageService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Cloudinary upload failed: " + e.getMessage(), e);
+
+        } finally {
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
