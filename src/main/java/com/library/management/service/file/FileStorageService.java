@@ -20,12 +20,17 @@ import java.util.UUID;
 public class FileStorageService {
 
     private static final List<String> ALLOWED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".webp");
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
 
     private final Cloudinary cloudinary;
 
     public FileUploadResponseDto saveBookCover(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new InvalidRequestException("File is required");
+        }
+
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new InvalidRequestException("Image size must not exceed 5 MB");
         }
 
         String originalName = file.getOriginalFilename();
@@ -37,11 +42,10 @@ public class FileStorageService {
 
         try {
             String splashColor = extractDominantColor(file);
-
             String publicId = "library-management/book-covers/" + UUID.randomUUID();
 
             Map uploadResult = cloudinary.uploader().upload(
-                    file.getBytes(),
+                    file.getInputStream(),
                     ObjectUtils.asMap(
                             "public_id", publicId,
                             "resource_type", "image",
