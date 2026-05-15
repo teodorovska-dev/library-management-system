@@ -60,8 +60,9 @@ public class FileStorageService {
                     .splashColor(splashColor)
                     .build();
 
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to upload book cover to Cloudinary", e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Cloudinary upload failed: " + e.getMessage(), e);
         }
     }
 
