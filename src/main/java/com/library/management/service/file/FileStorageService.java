@@ -1,25 +1,27 @@
 package com.library.management.service.file;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.library.management.dto.file.FileUploadResponseDto;
 import com.library.management.exception.InvalidRequestException;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FileStorageService {
 
     private static final List<String> ALLOWED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".webp");
 
-    @Value("${app.upload.dir:uploads}")
-    private String uploadDir;
+    private final Cloudinary cloudinary;
 
     public FileUploadResponseDto saveBookCover(MultipartFile file) {
         if (file == null || file.isEmpty()) {
@@ -36,21 +38,26 @@ public class FileStorageService {
         try {
             String splashColor = extractDominantColor(file);
 
-            String fileName = UUID.randomUUID() + extension;
-            Path coversPath = Paths.get(uploadDir, "covers").toAbsolutePath().normalize();
+            String publicId = "library-management/book-covers/" + UUID.randomUUID();
 
-            Files.createDirectories(coversPath);
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "public_id", publicId,
+                            "resource_type", "image",
+                            "overwrite", true
+                    )
+            );
 
-            Path targetPath = coversPath.resolve(fileName).normalize();
-            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            String imageUrl = uploadResult.get("secure_url").toString();
 
             return FileUploadResponseDto.builder()
-                    .url("/uploads/covers/" + fileName)
+                    .url(imageUrl)
                     .splashColor(splashColor)
                     .build();
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store book cover", e);
+            throw new RuntimeException("Failed to upload book cover to Cloudinary", e);
         }
     }
 
