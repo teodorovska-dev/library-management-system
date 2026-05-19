@@ -23,6 +23,8 @@ public class BookMapper {
         book.setLanguages(dto.getLanguages());
         book.setIsbn(dto.getIsbn());
         book.setPublisher(dto.getPublisher());
+        book.setFormat(dto.getFormat());
+        book.setFeatures(dto.getFeatures());
         book.setDescription(dto.getDescription());
         book.setCoverImageUrl(dto.getCoverImageUrl());
         book.setSplashColor(
@@ -55,6 +57,8 @@ public class BookMapper {
                 .languages(book.getLanguages())
                 .isbn(book.getIsbn())
                 .publisher(book.getPublisher())
+                .format(book.getFormat())
+                .features(book.getFeatures())
                 .description(book.getDescription())
                 .coverImageUrl(book.getCoverImageUrl())
                 .splashColor(book.getSplashColor())
@@ -77,6 +81,8 @@ public class BookMapper {
         book.setLanguages(dto.getLanguages());
         book.setIsbn(dto.getIsbn());
         book.setPublisher(dto.getPublisher());
+        book.setFormat(dto.getFormat());
+        book.setFeatures(dto.getFeatures());
         book.setDescription(dto.getDescription());
         book.setCoverImageUrl(dto.getCoverImageUrl());
 

@@ -22,6 +22,8 @@ public class BookResponseDto {
     private List<String> languages;
     private String isbn;
     private String publisher;
+    private String format;
+    private String features;
     private String description;
     private String coverImageUrl;
     private String splashColor;

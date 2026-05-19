@@ -54,6 +54,12 @@ public class Book {
     @Column(length = 150)
     private String publisher;
 
+    @Column(length = 100)
+    private String format;
+
+    @Column(length = 255)
+    private String features;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

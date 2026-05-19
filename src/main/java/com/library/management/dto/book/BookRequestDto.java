@@ -76,6 +76,14 @@ public class BookRequestDto {
     )
     private String publisher;
 
+    @NotBlank(message = "Format is required")
+    @Size(min = 2, max = 100, message = "Format must be between 2 and 100 characters")
+    private String format;
+
+    @NotBlank(message = "Features are required")
+    @Size(min = 2, max = 255, message = "Features must be between 2 and 255 characters")
+    private String features;
+
     @Size(max = 2000, message = "Description cannot exceed 2000 characters")
     private String description;
 
