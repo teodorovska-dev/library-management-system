@@ -19,7 +19,7 @@ The project follows modern backend and frontend development practices using REST
 
 ### Frontend
 ```text
-https://library-management-frontend-teodorovska-devs-projects.vercel.app/profile
+https://library-management-frontend-teodorovska-devs-projects.vercel.app
 ```
 
 ### Backend API
